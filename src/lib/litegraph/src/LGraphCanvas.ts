@@ -4,7 +4,6 @@ import { PREFIX, SEPARATOR } from '@/constants/groupNodeConstants'
 import { LitegraphLinkAdapter } from '@/renderer/core/canvas/litegraph/litegraphLinkAdapter'
 import type { LinkRenderContext } from '@/renderer/core/canvas/litegraph/litegraphLinkAdapter'
 import { getSlotPosition } from '@/renderer/core/canvas/litegraph/slotCalculations'
-import { useLayoutMutations } from '@/renderer/core/layout/operations/layoutMutations'
 import { layoutStore } from '@/renderer/core/layout/store/layoutStore'
 import { LayoutSource } from '@/renderer/core/layout/types'
 import { removeNodeTitleHeight } from '@/renderer/core/layout/utils/nodeSizeUtil'
@@ -2354,8 +2353,7 @@ export class LGraphCanvas implements CustomEventDispatcher<LGraphCanvasEventMap>
       const cloned = items?.created[0] as LGraphNode | undefined
       if (!cloned) return
 
-      cloned.pos[0] += 5
-      cloned.pos[1] += 5
+      cloned.setPos(cloned.pos[0] + 5, cloned.pos[1] + 5)
 
       if (this.allow_dragnodes) {
         pointer.onDragStart = (pointer) => {
@@ -4032,8 +4030,14 @@ export class LGraphCanvas implements CustomEventDispatcher<LGraphCanvasEventMap>
 
     // Adjust positions
     for (const item of created) {
-      item.pos[0] += position[0] - offsetX
-      item.pos[1] += position[1] - offsetY
+      const newX = item.pos[0] + position[0] - offsetX
+      const newY = item.pos[1] + position[1] - offsetY
+      if (item instanceof LGraphNode) {
+        item.setPos(newX, newY)
+      } else {
+        item.pos[0] = newX
+        item.pos[1] = newY
+      }
     }
 
     // TODO: Report failures, i.e. `failedNodes`
@@ -6244,7 +6248,7 @@ export class LGraphCanvas implements CustomEventDispatcher<LGraphCanvasEventMap>
                 options
               )
             ) {
-              node.pos[0] -= node.size[0] * 0.5
+              node.setPos(node.pos[0] - node.size[0] * 0.5, node.pos[1])
             }
           })
           break
@@ -8532,25 +8536,12 @@ export class LGraphCanvas implements CustomEventDispatcher<LGraphCanvasEventMap>
    * Apply batched node position updates
    */
   private applyNodePositionUpdates(
-    nodesToMove: Array<{ node: LGraphNode; newPos: { x: number; y: number } }>,
-    mutations: ReturnType<typeof useLayoutMutations>
+    nodesToMove: Array<{ node: LGraphNode; newPos: { x: number; y: number } }>
   ): void {
     for (const { node, newPos } of nodesToMove) {
-      // Update LiteGraph position first so next drag uses correct base position
-      node.pos[0] = newPos.x
-      node.pos[1] = newPos.y
-      // Then update layout store which will update Vue nodes
-      mutations.moveNode(node.id, newPos)
+      // setPos automatically syncs to layout store
+      node.setPos(newPos.x, newPos.y)
     }
-  }
-
-  /**
-   * Initialize layout mutations with Canvas source
-   */
-  private initLayoutMutations(): ReturnType<typeof useLayoutMutations> {
-    const mutations = useLayoutMutations()
-    mutations.setSource(LayoutSource.Canvas)
-    return mutations
   }
 
   /**
@@ -8600,7 +8591,6 @@ export class LGraphCanvas implements CustomEventDispatcher<LGraphCanvasEventMap>
     deltaX: number,
     deltaY: number
   ) {
-    const mutations = this.initLayoutMutations()
     const nodesInMovingGroups = this.collectNodesInGroups(allItems)
     const nodesToMove: NewNodePosition[] = []
 
@@ -8626,11 +8616,10 @@ export class LGraphCanvas implements CustomEventDispatcher<LGraphCanvasEventMap>
     }
 
     // Now apply all the node moves at once
-    this.applyNodePositionUpdates(nodesToMove, mutations)
+    this.applyNodePositionUpdates(nodesToMove)
   }
 
   repositionNodesVueMode(nodesToReposition: NewNodePosition[]) {
-    const mutations = this.initLayoutMutations()
-    this.applyNodePositionUpdates(nodesToReposition, mutations)
+    this.applyNodePositionUpdates(nodesToReposition)
   }
 }

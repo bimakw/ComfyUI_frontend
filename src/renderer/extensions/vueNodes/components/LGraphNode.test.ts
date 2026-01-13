@@ -213,9 +213,10 @@ describe('LGraphNode', () => {
       }
     })
 
+    // layoutStore size.height (100) + NODE_TITLE_HEIGHT (30) = 130px
     expect(wrapper.element.style.getPropertyValue('--node-height')).toBe('')
     expect(wrapper.element.style.getPropertyValue('--node-height-x')).toBe(
-      '100px'
+      '130px'
     )
   })
 
@@ -227,8 +228,9 @@ describe('LGraphNode', () => {
       }
     })
 
+    // layoutStore size.height (100) + NODE_TITLE_HEIGHT (30) = 130px
     expect(wrapper.element.style.getPropertyValue('--node-height')).toBe(
-      '100px'
+      '130px'
     )
     expect(wrapper.element.style.getPropertyValue('--node-height-x')).toBe('')
   })
