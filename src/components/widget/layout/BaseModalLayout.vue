@@ -19,7 +19,14 @@
           class="w-full h-18 px-6 flex items-center justify-between gap-2"
         >
           <div class="flex flex-1 shrink-0 gap-2">
-            <Button v-if="!notMobile" size="icon" @click="toggleLeftPanel">
+            <Button
+              v-if="!notMobile"
+              size="icon"
+              :aria-label="
+                showLeftPanel ? t('g.hideLeftPanel') : t('g.showLeftPanel')
+              "
+              @click="toggleLeftPanel"
+            >
               <i
                 :class="
                   cn(
@@ -38,11 +45,17 @@
               v-if="hasRightPanel"
               size="lg"
               class="w-10 p-0"
+              :aria-label="t('g.showRightPanel')"
               @click="toggleRightPanel"
             >
               <i class="icon-[lucide--panel-right] size-4" />
             </Button>
-            <Button size="lg" class="w-10" @click="closeDialog">
+            <Button
+              size="lg"
+              class="w-10"
+              :aria-label="t('g.closeDialog')"
+              @click="closeDialog"
+            >
               <i class="pi pi-times" />
             </Button>
           </template>
@@ -79,10 +92,20 @@
               <slot name="rightPanelHeaderTitle" />
             </div>
             <slot name="rightPanelHeaderActions" />
-            <Button size="lg" class="w-10 p-0" @click="toggleRightPanel">
+            <Button
+              size="lg"
+              class="w-10 p-0"
+              :aria-label="t('g.hideRightPanel')"
+              @click="toggleRightPanel"
+            >
               <i class="icon-[lucide--panel-right-close] size-4" />
             </Button>
-            <Button size="lg" class="w-10 p-0" @click="closeDialog">
+            <Button
+              size="lg"
+              class="w-10 p-0"
+              :aria-label="t('g.closeDialog')"
+              @click="closeDialog"
+            >
               <i class="pi pi-times" />
             </Button>
           </header>
@@ -98,10 +121,13 @@
 <script setup lang="ts">
 import { useBreakpoints } from '@vueuse/core'
 import { computed, inject, ref, useSlots, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import Button from '@/components/ui/button/Button.vue'
 import { OnCloseKey } from '@/types/widgetTypes'
 import { cn } from '@/utils/tailwindUtil'
+
+const { t } = useI18n()
 
 const { contentTitle, rightPanelTitle } = defineProps<{
   contentTitle: string
