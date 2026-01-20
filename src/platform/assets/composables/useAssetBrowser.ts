@@ -2,7 +2,8 @@ import { computed, ref } from 'vue'
 import type { Ref } from 'vue'
 import { useFuse } from '@vueuse/integrations/useFuse'
 import type { UseFuseOptions } from '@vueuse/integrations/useFuse'
-import { useI18n } from 'vue-i18n'
+
+import { d, t } from '@/i18n'
 import type { FilterState } from '@/platform/assets/components/AssetFilterBar.vue'
 import type { AssetItem } from '@/platform/assets/schemas/assetSchema'
 import type { NavGroupData, NavItemData } from '@/types/navTypes'
@@ -82,7 +83,6 @@ export interface AssetDisplayItem extends AssetItem {
 export function useAssetBrowser(
   assetsSource: Ref<AssetItem[] | undefined> = ref<AssetItem[] | undefined>([])
 ) {
-  const { t, d } = useI18n()
   const assets = computed<AssetItem[]>(() => assetsSource.value ?? [])
   // State
   const searchQuery = ref('')
