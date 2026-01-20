@@ -14,7 +14,7 @@ import {
 
 type OwnershipOption = 'all' | 'my-models' | 'public-models'
 
-type NavId = 'all' | 'imported' | string
+type NavId = 'all' | 'imported' | (string & {})
 
 function filterByCategory(category: string) {
   return (asset: AssetItem) => {
