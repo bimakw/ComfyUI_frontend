@@ -2,8 +2,10 @@ import { computed, ref } from 'vue'
 import type { Ref } from 'vue'
 import { useFuse } from '@vueuse/integrations/useFuse'
 import type { UseFuseOptions } from '@vueuse/integrations/useFuse'
+import { storeToRefs } from 'pinia'
 
 import { d, t } from '@/i18n'
+import { useAssetDownloadStore } from '@/stores/assetDownloadStore'
 import type { FilterState } from '@/platform/assets/components/AssetFilterBar.vue'
 import type { AssetItem } from '@/platform/assets/schemas/assetSchema'
 import type { NavGroupData, NavItemData } from '@/types/navTypes'
@@ -85,6 +87,8 @@ export function useAssetBrowser(
   assetsSource: Ref<AssetItem[] | undefined> = ref<AssetItem[] | undefined>([])
 ) {
   const assets = computed<AssetItem[]>(() => assetsSource.value ?? [])
+  const assetDownloadStore = useAssetDownloadStore()
+  const { sessionDownloadCount } = storeToRefs(assetDownloadStore)
   // State
   const searchQuery = ref('')
   const selectedNavItem = ref<NavId>('all')
@@ -179,7 +183,11 @@ export function useAssetBrowser(
       {
         id: 'imported',
         label: t('assetBrowser.imported'),
-        icon: 'icon-[lucide--folder-input]'
+        icon: 'icon-[lucide--folder-input]',
+        badge:
+          sessionDownloadCount.value > 0
+            ? sessionDownloadCount.value
+            : undefined
       }
     ]
 
