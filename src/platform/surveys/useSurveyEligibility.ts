@@ -22,7 +22,7 @@ interface SurveyState {
   optedOut: boolean
 }
 
-const STORAGE_KEY = 'comfy.surveyState'
+const STORAGE_KEY = 'Comfy.SurveyState'
 const GLOBAL_COOLDOWN_MS = 14 * 24 * 60 * 60 * 1000 // 14 days
 const DEFAULT_THRESHOLD = 3
 const DEFAULT_DELAY_MS = 5000
@@ -117,7 +117,7 @@ export function useSurveyEligibility(
   }
 }
 
-const USER_SAMPLING_ID_KEY = 'comfy.surveyUserId'
+const USER_SAMPLING_ID_KEY = 'Comfy.SurveyUserId'
 
 function getUserSamplingId(): string {
   let id = localStorage.getItem(USER_SAMPLING_ID_KEY)

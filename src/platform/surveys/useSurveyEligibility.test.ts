@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-const SURVEY_STATE_KEY = 'comfy.surveyState'
-const FEATURE_USAGE_KEY = 'comfy.featureUsage'
-const USER_SAMPLING_ID_KEY = 'comfy.surveyUserId'
+const SURVEY_STATE_KEY = 'Comfy.SurveyState'
+const FEATURE_USAGE_KEY = 'Comfy.FeatureUsage'
+const USER_SAMPLING_ID_KEY = 'Comfy.SurveyUserId'
 
 const mockIsNightly = vi.hoisted(() => ({ value: true }))
 const mockIsCloud = vi.hoisted(() => ({ value: false }))
