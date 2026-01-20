@@ -175,7 +175,7 @@ const isNewlyImported = computed(() =>
 )
 
 function handleSelect() {
-  assetDownloadStore.acknowledgeAsset(asset.id)
+  assetDownloadStore.acknowledgeDownload(asset.id)
   emit('select', asset)
 }
 

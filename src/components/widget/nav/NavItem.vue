@@ -5,11 +5,13 @@
       disabled: !isOverflowing,
       pt: { text: { class: 'whitespace-nowrap' } }
     }"
-    class="flex cursor-pointer items-start gap-2 rounded-md px-4 py-3 text-sm transition-colors text-base-foreground"
     :class="
-      active
-        ? 'bg-interface-menu-component-surface-selected'
-        : 'hover:bg-interface-menu-component-surface-hovered'
+      cn(
+        'flex cursor-pointer items-center-safe gap-2 rounded-md px-4 py-3 text-sm transition-colors text-base-foreground',
+        active
+          ? 'bg-interface-menu-component-surface-selected'
+          : 'hover:bg-interface-menu-component-surface-hovered'
+      )
     "
     role="button"
     @mouseenter="checkOverflow"
@@ -20,12 +22,14 @@
     </div>
     <i v-else class="text-neutral icon-[lucide--folder] text-xs shrink-0" />
     <span ref="textRef" class="min-w-0 truncate">
-      <slot></slot>
+      <slot />
     </span>
     <StatusBadge
       v-if="badge !== undefined"
       :label="String(badge)"
       severity="contrast"
+      variant="circle"
+      class="ml-auto"
     />
   </div>
 </template>
@@ -37,6 +41,7 @@ import StatusBadge from '@/components/common/StatusBadge.vue'
 import type { NavItemData } from '@/types/navTypes'
 
 import NavIcon from './NavIcon.vue'
+import { cn } from '@/utils/tailwindUtil'
 
 const { icon, badge, active, onClick } = defineProps<{
   icon: NavItemData['icon']

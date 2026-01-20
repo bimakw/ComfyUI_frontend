@@ -62,7 +62,7 @@ export const useAssetDownloadStore = defineStore('assetDownload', () => {
   )
   const unacknowledgedDownloads = computed(() =>
     finishedDownloads.value.filter(
-      (d) => d.status === 'completed' && d.assetId && !d.acknowledged
+      (d) => d.status === 'completed' && !d.acknowledged
     )
   )
   const sessionDownloadCount = computed(
@@ -71,13 +71,15 @@ export const useAssetDownloadStore = defineStore('assetDownload', () => {
   const hasActiveDownloads = computed(() => activeDownloads.value.length > 0)
   const hasDownloads = computed(() => downloads.value.size > 0)
 
-  function isDownloadedThisSession(assetId: string): boolean {
-    return unacknowledgedDownloads.value.some((d) => d.assetId === assetId)
+  function isDownloadedThisSession(identifier: string): boolean {
+    return unacknowledgedDownloads.value.some(
+      (d) => d.assetId === identifier || d.taskId === identifier
+    )
   }
 
-  function acknowledgeAsset(assetId: string) {
+  function acknowledgeDownload(identifier: string) {
     for (const download of downloads.value.values()) {
-      if (download.assetId === assetId) {
+      if (download.assetId === identifier || download.taskId === identifier) {
         download.acknowledged = true
       }
     }
@@ -197,6 +199,6 @@ export const useAssetDownloadStore = defineStore('assetDownload', () => {
     trackDownload,
     clearFinishedDownloads,
     isDownloadedThisSession,
-    acknowledgeAsset
+    acknowledgeDownload
   }
 })

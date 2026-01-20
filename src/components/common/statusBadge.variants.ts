@@ -11,14 +11,15 @@ export const statusBadgeVariants = cva({
       danger: 'bg-destructive-background text-white',
       contrast: 'bg-base-foreground text-base-background'
     },
-    mode: {
+    variant: {
       label: 'h-3.5 px-1 text-xxxs font-semibold uppercase',
-      dot: 'size-2'
+      dot: 'size-2',
+      circle: 'size-3.5 text-xxxs font-semibold'
     }
   },
   defaultVariants: {
     severity: 'default',
-    mode: 'label'
+    variant: 'label'
   }
 })
 

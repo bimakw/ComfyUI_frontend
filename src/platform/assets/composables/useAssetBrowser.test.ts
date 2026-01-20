@@ -683,7 +683,7 @@ describe('useAssetBrowser', () => {
       })
 
       // Acknowledge the download
-      store.acknowledgeAsset('asset-123')
+      store.acknowledgeDownload('asset-123')
 
       const { navItems } = useAssetBrowser(ref([]))
 

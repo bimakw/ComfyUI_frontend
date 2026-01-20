@@ -252,7 +252,7 @@ describe('useAssetDownloadStore', () => {
       expect(store.sessionDownloadCount).toBe(1)
     })
 
-    it('does not count completed downloads without asset IDs', () => {
+    it('counts completed downloads without asset IDs (uses taskId as fallback)', () => {
       const store = useAssetDownloadStore()
 
       dispatch(
@@ -263,7 +263,8 @@ describe('useAssetDownloadStore', () => {
         })
       )
 
-      expect(store.sessionDownloadCount).toBe(0)
+      expect(store.sessionDownloadCount).toBe(1)
+      expect(store.isDownloadedThisSession('task-123')).toBe(true)
     })
 
     it('does not count failed downloads', () => {
@@ -294,7 +295,7 @@ describe('useAssetDownloadStore', () => {
       expect(store.isDownloadedThisSession('other-asset')).toBe(false)
     })
 
-    it('acknowledgeAsset decrements session count', () => {
+    it('acknowledgeDownload decrements session count by assetId', () => {
       const store = useAssetDownloadStore()
 
       dispatch(
@@ -306,10 +307,28 @@ describe('useAssetDownloadStore', () => {
       )
       expect(store.sessionDownloadCount).toBe(1)
 
-      store.acknowledgeAsset('asset-456')
+      store.acknowledgeDownload('asset-456')
 
       expect(store.sessionDownloadCount).toBe(0)
       expect(store.isDownloadedThisSession('asset-456')).toBe(false)
+    })
+
+    it('acknowledgeDownload decrements session count by taskId', () => {
+      const store = useAssetDownloadStore()
+
+      dispatch(
+        createDownloadMessage({
+          status: 'completed',
+          progress: 100,
+          asset_id: undefined
+        })
+      )
+      expect(store.sessionDownloadCount).toBe(1)
+
+      store.acknowledgeDownload('task-123')
+
+      expect(store.sessionDownloadCount).toBe(0)
+      expect(store.isDownloadedThisSession('task-123')).toBe(false)
     })
   })
 })
