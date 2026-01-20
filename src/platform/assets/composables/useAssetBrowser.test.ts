@@ -1,3 +1,5 @@
+import { createTestingPinia } from '@pinia/testing'
+import { setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { nextTick, ref } from 'vue'
 
@@ -18,8 +20,24 @@ vi.mock('@/i18n', () => ({
   d: (date: Date) => date.toLocaleDateString()
 }))
 
+type DownloadEventHandler = (e: CustomEvent) => void
+const eventHandler = vi.hoisted(() => {
+  const state: { current: DownloadEventHandler | null } = { current: null }
+  return state
+})
+
+vi.mock('@/scripts/api', () => ({
+  api: {
+    addEventListener: vi.fn((_event: string, handler: DownloadEventHandler) => {
+      eventHandler.current = handler
+    }),
+    removeEventListener: vi.fn()
+  }
+}))
+
 describe('useAssetBrowser', () => {
   beforeEach(() => {
+    setActivePinia(createTestingPinia({ stubActions: false }))
     vi.restoreAllMocks()
   })
 
@@ -603,6 +621,76 @@ describe('useAssetBrowser', () => {
       selectedNavItem.value = 'OtherFolder'
       expect(categoryFilteredAssets.value).toHaveLength(1)
       expect(categoryFilteredAssets.value[0].id).toBe('asset-4')
+    })
+  })
+
+  describe('Session Download Badge', () => {
+    function dispatchDownloadEvent(data: {
+      task_id: string
+      asset_id?: string
+      asset_name: string
+      bytes_total: number
+      bytes_downloaded: number
+      progress: number
+      status: 'created' | 'running' | 'completed' | 'failed'
+    }) {
+      if (!eventHandler.current) {
+        throw new Error('Event handler not registered')
+      }
+      eventHandler.current(new CustomEvent('asset_download', { detail: data }))
+    }
+
+    it('shows badge on imported nav item when there are unacknowledged downloads', async () => {
+      // Initialize the store first to register event handler
+      const { useAssetDownloadStore } =
+        await import('@/stores/assetDownloadStore')
+      useAssetDownloadStore()
+
+      // Dispatch a completed download event
+      dispatchDownloadEvent({
+        task_id: 'task-1',
+        asset_id: 'asset-123',
+        asset_name: 'model.safetensors',
+        bytes_total: 1000,
+        bytes_downloaded: 1000,
+        progress: 100,
+        status: 'completed'
+      })
+
+      const { navItems } = useAssetBrowser(ref([]))
+
+      const importedItem = navItems.value.find(
+        (item) => 'id' in item && item.id === 'imported'
+      )
+      expect(importedItem).toBeDefined()
+      expect((importedItem as { badge?: number }).badge).toBe(1)
+    })
+
+    it('does not show badge when all downloads are acknowledged', async () => {
+      const { useAssetDownloadStore } =
+        await import('@/stores/assetDownloadStore')
+      const store = useAssetDownloadStore()
+
+      // Dispatch a completed download event
+      dispatchDownloadEvent({
+        task_id: 'task-1',
+        asset_id: 'asset-123',
+        asset_name: 'model.safetensors',
+        bytes_total: 1000,
+        bytes_downloaded: 1000,
+        progress: 100,
+        status: 'completed'
+      })
+
+      // Acknowledge the download
+      store.acknowledgeAsset('asset-123')
+
+      const { navItems } = useAssetBrowser(ref([]))
+
+      const importedItem = navItems.value.find(
+        (item) => 'id' in item && item.id === 'imported'
+      )
+      expect((importedItem as { badge?: number }).badge).toBeUndefined()
     })
   })
 })
