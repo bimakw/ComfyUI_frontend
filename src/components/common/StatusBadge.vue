@@ -2,11 +2,27 @@
 type Severity = 'default' | 'secondary' | 'warn' | 'danger' | 'contrast'
 
 const { label, severity = 'default' } = defineProps<{
-  label: string
+  label?: string | number
   severity?: Severity
 }>()
 
-function badgeClasses(sev: Severity): string {
+function badgeClasses(sev: Severity, hasLabel: boolean): string {
+  if (!hasLabel) {
+    const dotBase = 'inline-block size-2 rounded-full'
+    switch (sev) {
+      case 'danger':
+        return `${dotBase} bg-destructive-background`
+      case 'contrast':
+        return `${dotBase} bg-base-foreground`
+      case 'warn':
+        return `${dotBase} bg-warning-background`
+      case 'secondary':
+        return `${dotBase} bg-secondary-background`
+      default:
+        return `${dotBase} bg-primary-background`
+    }
+  }
+
   const baseClasses =
     'inline-flex h-3.5 items-center justify-center rounded-full px-1 text-xxxs font-semibold uppercase'
 
@@ -26,5 +42,5 @@ function badgeClasses(sev: Severity): string {
 </script>
 
 <template>
-  <span :class="badgeClasses(severity)">{{ label }}</span>
+  <span :class="badgeClasses(severity, label != null)">{{ label }}</span>
 </template>
