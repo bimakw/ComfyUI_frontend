@@ -9,12 +9,12 @@
   >
     <template v-if="shouldShowLeftPanel" #leftPanel>
       <LeftSidePanel
-        v-model="selectedCategory"
+        v-model="selectedNavItem"
         data-component-id="AssetBrowserModal-LeftSidePanel"
-        :nav-items="availableCategories"
+        :nav-items
       >
         <template #header-icon>
-          <div class="icon-[lucide--folder] size-4" />
+          <div class="icon-[comfy--ai-model] size-4" />
         </template>
         <template #header-title>
           <span class="capitalize">{{ displayTitle }}</span>
@@ -49,7 +49,6 @@
     <template #contentFilter>
       <AssetFilterBar
         :assets="categoryFilteredAssets"
-        :all-assets="fetchedAssets"
         @filter-change="updateFilters"
       />
     </template>
@@ -59,6 +58,7 @@
         :assets="filteredAssets"
         :loading="isLoading"
         :focused-asset-id="focusedAsset?.id"
+        :empty-message
         @asset-focus="handleAssetFocus"
         @asset-blur="focusedAsset = null"
         @asset-select="handleAssetSelectAndEmit"
@@ -165,10 +165,12 @@ const { isUploadButtonEnabled, showUploadDialog } =
 
 const {
   searchQuery,
+  selectedNavItem,
   selectedCategory,
-  availableCategories,
+  navItems,
   categoryFilteredAssets,
   filteredAssets,
+  isImportedSelected,
   updateFilters
 } = useAssetBrowser(fetchedAssets)
 
@@ -209,6 +211,14 @@ const displayTitle = computed(() => {
 
 const shouldShowLeftPanel = computed(() => {
   return props.showLeftPanel ?? true
+})
+
+const emptyMessage = computed(() => {
+  if (!isImportedSelected.value) return undefined
+
+  return isUploadButtonEnabled.value
+    ? t('assetBrowser.emptyImported.canImport')
+    : t('assetBrowser.emptyImported.restricted')
 })
 
 function handleClose() {
