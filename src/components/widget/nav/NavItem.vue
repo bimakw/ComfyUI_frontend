@@ -39,9 +39,9 @@ import { computed, ref } from 'vue'
 
 import StatusBadge from '@/components/common/StatusBadge.vue'
 import type { NavItemData } from '@/types/navTypes'
+import { cn } from '@/utils/tailwindUtil'
 
 import NavIcon from './NavIcon.vue'
-import { cn } from '@/utils/tailwindUtil'
 
 const { icon, badge, active, onClick } = defineProps<{
   icon: NavItemData['icon']
