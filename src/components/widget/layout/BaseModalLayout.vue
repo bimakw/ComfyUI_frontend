@@ -166,7 +166,9 @@ const showLeftPanel = computed(() => {
 })
 
 const gridStyle = computed(() => ({
-  gridTemplateColumns: `${hasLeftPanel.value && showLeftPanel.value ? '14rem' : '0rem'} 1fr ${isRightPanelOpen.value ? '18rem' : '0rem'}`
+  gridTemplateColumns: hasRightPanel.value
+    ? `${hasLeftPanel.value && showLeftPanel.value ? '14rem' : '0rem'} 1fr ${isRightPanelOpen.value ? '18rem' : '0rem'}`
+    : `${hasLeftPanel.value && showLeftPanel.value ? '14rem' : '0rem'} 1fr`
 }))
 
 const toggleLeftPanel = () => {
