@@ -503,7 +503,7 @@ describe('useAssetBrowser', () => {
         icon: 'icon-[lucide--folder-input]'
       })
       expect(navItems.value[2]).toMatchObject({
-        title: 'BY TYPE',
+        title: 'By type',
         collapsible: false
       })
       const byTypeGroup = navItems.value[2] as { items: unknown[] }
