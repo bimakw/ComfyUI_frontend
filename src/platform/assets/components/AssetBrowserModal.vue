@@ -63,6 +63,7 @@
         @asset-blur="focusedAsset = null"
         @asset-select="handleAssetSelectAndEmit"
         @asset-deleted="refreshAssets"
+        @asset-show-info="handleShowInfo"
       />
     </template>
 
@@ -217,6 +218,11 @@ function handleClose() {
 
 function handleAssetFocus(asset: AssetDisplayItem) {
   focusedAsset.value = asset
+}
+
+function handleShowInfo(asset: AssetDisplayItem) {
+  focusedAsset.value = asset
+  isRightPanelOpen.value = true
 }
 
 function handleAssetSelectAndEmit(asset: AssetDisplayItem) {
