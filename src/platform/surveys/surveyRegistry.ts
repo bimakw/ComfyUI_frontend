@@ -11,6 +11,7 @@ export const FEATURE_SURVEYS: Record<string, FeatureSurveyConfig> = {
   //   typeformId: 'abc123',
   //   triggerThreshold: 3,
   //   delayMs: 5000,
+  //   sampleRate: 0.3,
   //   enabled: true
   // }
 }
