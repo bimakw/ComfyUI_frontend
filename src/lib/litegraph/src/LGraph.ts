@@ -986,41 +986,13 @@ export class LGraph
     }
 
     // Handle SubgraphNode-specific cleanup
+    // Each SubgraphNode owns a unique Subgraph definition (no linked subgraphs)
     if (node.isSubgraphNode()) {
-      const subgraphId = node.subgraph.id
-
-      // Check if other nodes reference this subgraph (excluding the node being removed)
-      const hasOtherReferences = this.rootGraph.nodes.some(
-        (n) => n !== node && n.isSubgraphNode() && n.subgraph.id === subgraphId
-      )
-
-      // Also check nested subgraphs for references
-      let foundInNested = false
-      if (!hasOtherReferences) {
-        for (const subgraph of this.rootGraph.subgraphs.values()) {
-          if (subgraph.id === subgraphId) continue
-          for (const subNode of subgraph.nodes) {
-            if (
-              subNode !== node &&
-              subNode.isSubgraphNode() &&
-              subNode.subgraph.id === subgraphId
-            ) {
-              foundInNested = true
-              break
-            }
-          }
-          if (foundInNested) break
-        }
+      for (const innerNode of node.subgraph.nodes) {
+        innerNode.onRemoved?.()
+        node.subgraph.onNodeRemoved?.(innerNode)
       }
-
-      // Only clean up inner nodes and delete definition if no other references
-      if (!hasOtherReferences && !foundInNested) {
-        for (const innerNode of node.subgraph.nodes) {
-          innerNode.onRemoved?.()
-          node.subgraph.onNodeRemoved?.(innerNode)
-        }
-        this.rootGraph.subgraphs.delete(subgraphId)
-      }
+      this.rootGraph.subgraphs.delete(node.subgraph.id)
     }
 
     // callback

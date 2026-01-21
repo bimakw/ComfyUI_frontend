@@ -261,7 +261,7 @@ describe('Subgraph Definition Garbage Collection', () => {
     expect(graphRemovedNodeIds.size).toBe(2)
   })
 
-  it('subgraph definition is removed when last referencing node is removed', () => {
+  it('subgraph definition is removed when SubgraphNode is removed', () => {
     const rootGraph = new LGraph()
     const { subgraph } = createSubgraphWithNodes(rootGraph, 1)
     const subgraphId = subgraph.id
@@ -272,28 +272,6 @@ describe('Subgraph Definition Garbage Collection', () => {
     expect(rootGraph.subgraphs.has(subgraphId)).toBe(true)
 
     rootGraph.remove(subgraphNode)
-
-    expect(rootGraph.subgraphs.has(subgraphId)).toBe(false)
-  })
-
-  it('subgraph definition is retained when other nodes still reference it', () => {
-    const rootGraph = new LGraph()
-    const { subgraph } = createSubgraphWithNodes(rootGraph, 1)
-    const subgraphId = subgraph.id
-
-    const subgraphNode1 = createTestSubgraphNode(subgraph, { pos: [100, 100] })
-    rootGraph.add(subgraphNode1)
-
-    const subgraphNode2 = createTestSubgraphNode(subgraph, { pos: [300, 100] })
-    rootGraph.add(subgraphNode2)
-
-    expect(rootGraph.subgraphs.has(subgraphId)).toBe(true)
-
-    rootGraph.remove(subgraphNode1)
-
-    expect(rootGraph.subgraphs.has(subgraphId)).toBe(true)
-
-    rootGraph.remove(subgraphNode2)
 
     expect(rootGraph.subgraphs.has(subgraphId)).toBe(false)
   })
