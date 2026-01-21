@@ -985,29 +985,12 @@ export class LGraph
       }
     }
 
-    // Handle SubgraphNode-specific cleanup
-    // Invariant: Each SubgraphNode owns a unique Subgraph definition (no linked subgraphs).
-    // Copy-paste generates new UUIDs, and subgraph nodes are not in the node picker.
     if (node.isSubgraphNode()) {
-      const subgraphId = node.subgraph.id
-
-      // Assert uniqueness invariant
-      const otherReferences = this.rootGraph.nodes.filter(
-        (n) => n !== node && n.isSubgraphNode() && n.subgraph.id === subgraphId
-      )
-      if (otherReferences.length > 0) {
-        console.error(
-          `Invariant violation: Subgraph ${subgraphId} is referenced by multiple nodes. ` +
-            `This indicates linked subgraphs exist, which should not happen.`,
-          { removedNode: node.id, otherNodes: otherReferences.map((n) => n.id) }
-        )
-      }
-
       for (const innerNode of node.subgraph.nodes) {
         innerNode.onRemoved?.()
         node.subgraph.onNodeRemoved?.(innerNode)
       }
-      this.rootGraph.subgraphs.delete(subgraphId)
+      this.rootGraph.subgraphs.delete(node.subgraph.id)
     }
 
     // callback
