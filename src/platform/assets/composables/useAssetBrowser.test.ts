@@ -5,6 +5,11 @@ import { nextTick, ref } from 'vue'
 
 import { useAssetBrowser } from '@/platform/assets/composables/useAssetBrowser'
 import type { AssetItem } from '@/platform/assets/schemas/assetSchema'
+import type { NavGroupData, NavItemData } from '@/types/navTypes'
+
+function isNavGroup(item: NavItemData | NavGroupData): item is NavGroupData {
+  return 'items' in item
+}
 
 vi.mock('@/i18n', () => ({
   t: (key: string) => {
@@ -520,12 +525,12 @@ describe('useAssetBrowser', () => {
         label: 'Imported',
         icon: 'icon-[lucide--folder-input]'
       })
-      expect(navItems.value[2]).toMatchObject({
+      const byTypeGroup = navItems.value[2]
+      expect(byTypeGroup).toMatchObject({
         title: 'By type',
         collapsible: false
       })
-      const byTypeGroup = navItems.value[2] as { items: unknown[] }
-      expect(byTypeGroup.items).toHaveLength(2)
+      expect(isNavGroup(byTypeGroup) && byTypeGroup.items).toHaveLength(2)
     })
 
     it('handles assets with no category tag', () => {
@@ -537,9 +542,9 @@ describe('useAssetBrowser', () => {
       const { navItems } = useAssetBrowser(ref(assets))
 
       expect(navItems.value).toHaveLength(3)
-      const byTypeGroup = navItems.value[2] as { items: { id: string }[] }
-      expect(byTypeGroup.items).toHaveLength(1)
-      expect(byTypeGroup.items[0].id).toBe('vae')
+      const byTypeGroup = navItems.value[2]
+      expect(isNavGroup(byTypeGroup) && byTypeGroup.items).toHaveLength(1)
+      expect(isNavGroup(byTypeGroup) && byTypeGroup.items[0].id).toBe('vae')
     })
 
     it('ignores non-models root tags', () => {
@@ -550,9 +555,11 @@ describe('useAssetBrowser', () => {
 
       const { navItems } = useAssetBrowser(ref(assets))
 
-      const byTypeGroup = navItems.value[2] as { items: { id: string }[] }
-      expect(byTypeGroup.items).toHaveLength(1)
-      expect(byTypeGroup.items[0].id).toBe('checkpoints')
+      const byTypeGroup = navItems.value[2]
+      expect(isNavGroup(byTypeGroup) && byTypeGroup.items).toHaveLength(1)
+      expect(isNavGroup(byTypeGroup) && byTypeGroup.items[0].id).toBe(
+        'checkpoints'
+      )
     })
 
     it('returns only quick filters when no type categories exist', () => {
@@ -604,11 +611,10 @@ describe('useAssetBrowser', () => {
       const { navItems, selectedNavItem, categoryFilteredAssets } =
         useAssetBrowser(ref(assets))
 
-      const byTypeGroup = navItems.value[2] as { items: { id: string }[] }
-      expect(byTypeGroup.items.map((i) => i.id)).toEqual([
-        'Chatterbox',
-        'OtherFolder'
-      ])
+      const byTypeGroup = navItems.value[2]
+      expect(
+        isNavGroup(byTypeGroup) && byTypeGroup.items.map((i) => i.id)
+      ).toEqual(['Chatterbox', 'OtherFolder'])
 
       selectedNavItem.value = 'Chatterbox'
       expect(categoryFilteredAssets.value).toHaveLength(3)
