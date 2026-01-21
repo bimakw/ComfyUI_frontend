@@ -31,8 +31,8 @@ function setupSubgraph(
   const subgraph = createTestSubgraph()
   const subgraphNode = createTestSubgraphNode(subgraph)
   subgraphNode._internalConfigureAfterSlots()
-  const graph = subgraphNode.graph!
-  graph.add(subgraphNode)
+  if (!subgraphNode.graph) throw new Error('subgraphNode has no graph')
+  subgraphNode.graph.add(subgraphNode)
   const innerNodes = []
   for (let i = 0; i < innerNodeCount; i++) {
     const innerNode = new LGraphNode(`InnerNode${i}`)

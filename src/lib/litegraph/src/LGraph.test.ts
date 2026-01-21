@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
 import { LGraph, LGraphNode, LiteGraph } from '@/lib/litegraph/src/litegraph'
-import { createTestSubgraphNode } from '@/lib/litegraph/src/subgraph/__fixtures__/subgraphHelpers'
+import {
+  createTestSubgraphData,
+  createTestSubgraphNode
+} from '@/lib/litegraph/src/subgraph/__fixtures__/subgraphHelpers'
 
 import { test } from './__fixtures__/testExtensions'
 
@@ -212,33 +215,7 @@ describe('Graph Clearing and Callbacks', () => {
 
 describe('Subgraph Definition Garbage Collection', () => {
   function createSubgraphWithNodes(rootGraph: LGraph, nodeCount: number) {
-    const subgraphData = {
-      version: 1 as const,
-      revision: 0,
-      state: { lastNodeId: 0, lastLinkId: 0, lastGroupId: 0, lastRerouteId: 0 },
-      nodes: [] as [],
-      links: [] as [],
-      groups: [] as [],
-      config: {},
-      definitions: { subgraphs: [] as [] },
-      id: `test-subgraph-${Date.now()}-${Math.random()}` as `${string}-${string}-${string}-${string}-${string}`,
-      name: 'Test Subgraph',
-      inputNode: {
-        id: -10,
-        bounding: [10, 100, 150, 126] as [number, number, number, number],
-        pinned: false
-      },
-      outputNode: {
-        id: -20,
-        bounding: [400, 100, 140, 126] as [number, number, number, number],
-        pinned: false
-      },
-      inputs: [] as [],
-      outputs: [] as [],
-      widgets: [] as []
-    }
-
-    const subgraph = rootGraph.createSubgraph(subgraphData)
+    const subgraph = rootGraph.createSubgraph(createTestSubgraphData())
 
     const innerNodes: LGraphNode[] = []
     for (let i = 0; i < nodeCount; i++) {
