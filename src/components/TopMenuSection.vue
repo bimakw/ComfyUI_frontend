@@ -186,8 +186,8 @@ const queueContextMenuItems = computed<MenuItem[]>(() => [
   {
     label: t('sideToolbar.queueProgressOverlay.clearQueueTooltip'),
     icon: 'icon-[lucide--list-x]',
-    class: 'text-destructive-background',
-    disabled: queueStore.pendingTasks.length === 0,
+    icon: 'icon-[lucide--list-x] text-destructive-background',
+    class: '*:text-destructive-background',
     command: () => {
       void handleClearQueue()
     }
